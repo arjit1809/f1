@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { CIRCUITS } from "../../../data/f1-data";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 export default function CircuitDetailPage() {
@@ -36,7 +36,7 @@ export default function CircuitDetailPage() {
           onClick={() => router.back()}
           className="group flex items-center gap-3 text-silver hover:text-white transition-colors"
         >
-          <span className="text-xl group-hover:-translate-x-1 transition-transform">←</span>
+          <span className="text-xl group-hover:-translate-x-1 transition-transform">&larr;</span>
           <span className="uppercase tracking-widest text-[10px]">Return to Calendar</span>
         </button>
         <div className="text-[10px] text-white/20 uppercase tracking-[0.5em]">
@@ -78,7 +78,7 @@ export default function CircuitDetailPage() {
           <div className="bg-white/5 border border-white/10 p-8 rounded-lg backdrop-blur-md border-l-4 border-l-red-500 shadow-2xl">
             <h3 className="text-[10px] font-bold text-red-500 uppercase mb-3 tracking-widest">Technical Insight</h3>
             <p className="text-silver italic text-sm leading-relaxed">
-              "{circuit.funFact}"
+              &quot;{circuit.funFact}&quot;
             </p>
           </div>
         </motion.div>

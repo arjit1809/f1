@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DRIVERS } from "../data/f1-data";
+import Image from "next/image";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -67,11 +68,7 @@ export default function DriverGrid() {
           card.addEventListener("mouseenter", onEnter);
           card.addEventListener("mouseleave", onLeave);
           
-          // Cleanup listeners
-          return () => {
-            card.removeEventListener("mouseenter", onEnter);
-            card.removeEventListener("mouseleave", onLeave);
-          };
+          // Cleanup listeners handled by ctx.revert() but we can be explicit
         }
       });
     }, sectionRef);
@@ -97,12 +94,15 @@ export default function DriverGrid() {
               className="group relative w-[300px] h-[450px] md:w-[400px] md:h-[550px] bg-[#111] overflow-hidden rounded-xl border border-[#333] shrink-0 transition-colors"
             >
                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10" />
-               <img
-                 ref={(el) => { imagesRef.current[index] = el; }}
-                 src={driver.image}
-                 alt={driver.name}
-                 className="absolute bottom-0 w-full object-contain object-bottom h-[90%] transition-transform duration-500"
-               />
+               <div className="absolute bottom-0 w-full h-[90%] transition-transform duration-500">
+                <Image
+                  ref={(el) => { imagesRef.current[index] = el as unknown as HTMLImageElement; }}
+                  src={driver.image}
+                  alt={driver.name}
+                  fill
+                  className="object-contain object-bottom"
+                />
+               </div>
                
               <div className="absolute inset-0 z-20 p-6 flex flex-col justify-between">
                 <div className="flex justify-between items-start">

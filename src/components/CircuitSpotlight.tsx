@@ -10,22 +10,40 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+interface CircuitStat {
+  record: string;
+  drs: string;
+  wear: string[];
+}
+
+interface Circuit {
+  id: string;
+  slug: string;
+  name: string;
+  location: string;
+  country: string;
+  path: string;
+  stats: CircuitStat;
+  color: string;
+  description: string;
+  funFact: string;
+}
+
 export default function CircuitSpotlight() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const spotlightRef = useRef<HTMLDivElement>(null);
   const deckRef = useRef<HTMLDivElement>(null);
   const [showGallery, setShowGallery] = useState(false);
 
   // Filter sequences: Monaco is now the sole spotlight
-  const monaco = CIRCUITS.find(c => c.id === 'monaco');
+  const monaco = (CIRCUITS as unknown as Circuit[]).find(c => c.id === 'monaco');
   // Miami moves to the "others" collection for the deck
-  const others = CIRCUITS.filter(c => c.id !== 'monaco');
+  const others = (CIRCUITS as unknown as Circuit[]).filter(c => c.id !== 'monaco');
 
   useEffect(() => {
     if (!containerRef.current) return;
 
     const ctx = gsap.context(() => {
-      const cards = gsap.utils.toArray(".circuit-card");
+      const cards = gsap.utils.toArray<HTMLElement>(".circuit-card");
       
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -50,7 +68,7 @@ export default function CircuitSpotlight() {
       );
 
       // FANNING THE DECK
-      cards.forEach((card: any, i: number) => {
+      cards.forEach((card, i) => {
         tl.to(card, {
           x: i * 80,
           rotateZ: i * 3,
@@ -64,7 +82,7 @@ export default function CircuitSpotlight() {
   }, []);
 
   // Sync Path Animation Helper
-  const SpotlightTrack = ({ circuit, className, startOffset, endOffset }: { circuit: any, className: string, startOffset: number, endOffset: number }) => {
+  const SpotlightTrack = ({ circuit, className, startOffset, endOffset }: { circuit: Circuit, className: string, startOffset: number, endOffset: number }) => {
     const pathRef = useRef<SVGPathElement>(null);
     useEffect(() => {
       if (!pathRef.current || !containerRef.current) return;
@@ -80,7 +98,7 @@ export default function CircuitSpotlight() {
           scrub: 1,
         }
       });
-    }, []);
+    }, [startOffset, endOffset]);
 
     return (
       <div className={`${className} absolute inset-0 w-full h-full flex flex-col md:flex-row items-center justify-center p-8 md:p-20 z-10 transition-opacity duration-500`}>
@@ -147,9 +165,9 @@ export default function CircuitSpotlight() {
                style={{ zIndex: idx, transformOrigin: "bottom center" }}
              >
                 <div className="absolute left-0 top-0 bottom-0 w-12 bg-black/40 border-r border-white/5 flex items-center justify-center z-20">
-                  <span className="font-heading text-white/40 font-bold uppercase tracking-[0.5em] text-[10px] -rotate-90 whitespace-nowrap group-hover:text-red-500 transition-colors">
-                    {circuit.name}
-                  </span>
+                   <span className="font-heading text-white/40 font-bold uppercase tracking-[0.5em] text-[10px] -rotate-90 whitespace-nowrap group-hover:text-red-500 transition-colors">
+                     {circuit.name}
+                   </span>
                 </div>
                 <div className="absolute inset-0 pl-16 p-8 flex flex-col justify-between">
                    <div>
@@ -166,7 +184,7 @@ export default function CircuitSpotlight() {
                    </div>
                    <div className="flex justify-between items-end border-t border-white/5 pt-4">
                       <div className="font-mono text-[9px] text-white/40 uppercase tracking-widest">Details</div>
-                      <span className="text-red-500 font-bold text-xs uppercase group-hover:translate-x-2 transition-transform">→</span>
+                      <span className="text-red-500 font-bold text-xs uppercase group-hover:translate-x-2 transition-transform">&rarr;</span>
                    </div>
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
@@ -198,13 +216,13 @@ export default function CircuitSpotlight() {
              onClick={() => setShowGallery(false)}
              className="absolute top-10 right-10 text-white font-mono uppercase text-[10px] tracking-widest border border-white/10 px-6 py-2 hover:bg-white hover:text-black transition-all flex items-center gap-2"
            >
-             <span className="text-lg">×</span> Close Gallery
+             <span className="text-lg">&times;</span> Close Gallery
            </button>
            <h2 className="font-heading text-4xl font-black text-white uppercase mb-12 tracking-[0.3em] text-center">
              The <span className="text-red-500 text-5xl">2025</span> Calendar
            </h2>
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl w-full">
-              {CIRCUITS.map(c => (
+              {(CIRCUITS as unknown as Circuit[]).map(c => (
                 <Link key={c.id} href={`/circuits/${c.slug}`} className="bg-white/5 border border-white/5 p-8 hover:border-red-500/50 transition-all group backdrop-blur-sm rounded-lg">
                    <div className="flex justify-between items-center mb-4">
                      <h3 className="font-heading text-xl font-bold text-white uppercase tracking-tighter">{c.name}</h3>
