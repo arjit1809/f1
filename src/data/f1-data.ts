@@ -1,4 +1,24 @@
+export interface CircuitStats {
+  record: string;
+  drs: string;
+  wear: string[];
+}
+
+export interface Circuit {
+  id: string;
+  slug: string;
+  name: string;
+  location: string;
+  country: string;
+  path: string;
+  stats: CircuitStats;
+  color: string;
+  description: string;
+  funFact: string;
+}
+
 export const DRIVERS = [
+  // ... (keeping existing content)
   { id: "verstappen", name: "Max Verstappen", team: "Red Bull Racing", country: "NL", points: 245, color: "bg-redbull", image: "https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/M/MAXVER01_Max_Verstappen/maxver01.png" },
   { id: "hamilton", name: "Lewis Hamilton", team: "Ferrari", country: "GB", points: 210, color: "bg-ferrari", image: "https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/L/LEWHAM01_Lewis_Hamilton/lewham01.png" },
   { id: "leclerc", name: "Charles Leclerc", team: "Ferrari", country: "MC", points: 198, color: "bg-ferrari", image: "https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/C/CHALEC01_Charles_Leclerc/chalec01.png" },

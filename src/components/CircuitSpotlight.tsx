@@ -3,30 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { CIRCUITS } from "../data/f1-data";
+import { CIRCUITS, Circuit } from "../data/f1-data";
 import Link from "next/link";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
-}
-
-interface CircuitStat {
-  record: string;
-  drs: string;
-  wear: string[];
-}
-
-interface Circuit {
-  id: string;
-  slug: string;
-  name: string;
-  location: string;
-  country: string;
-  path: string;
-  stats: CircuitStat;
-  color: string;
-  description: string;
-  funFact: string;
 }
 
 export default function CircuitSpotlight() {

@@ -1,19 +1,19 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { CIRCUITS } from "../../../data/f1-data";
+import { CIRCUITS, Circuit } from "../../../data/f1-data";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 export default function CircuitDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const [circuit, setCircuit] = useState<any>(null);
+  const [circuit, setCircuit] = useState<Circuit | null>(null);
 
   useEffect(() => {
     // Exact matching for slugs
-    const found = CIRCUITS.find((c) => c.slug === params.slug);
-    setCircuit(found);
+    const found = (CIRCUITS as unknown as Circuit[]).find((c) => c.slug === params.slug);
+    setCircuit(found || null);
   }, [params.slug]);
 
   if (!circuit) {
