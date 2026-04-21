@@ -122,8 +122,3 @@ export default function LiveStandings() {
     </section>
   );
 }
-
-      </div>
-    </section>
-  );
-}
