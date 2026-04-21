@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { fetch2026Calendar, Session } from "../lib/f1-api";
 
 export default function Calendar() {
