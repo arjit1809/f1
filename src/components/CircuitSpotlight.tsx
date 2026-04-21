@@ -17,30 +17,29 @@ export default function CircuitSpotlight() {
 
   // Filter sequences: Monaco is now the sole spotlight
   const monaco = (CIRCUITS as unknown as Circuit[]).find(c => c.id === 'monaco');
-  // Miami moves to the "others" collection for the deck
+  // Remaining circuits for the deck
   const others = (CIRCUITS as unknown as Circuit[]).filter(c => c.id !== 'monaco');
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const ctx = gsap.context(() => {
+    let mm = gsap.matchMedia();
+
+    // Desktop: Pin and complex aniamtion timeline
+    mm.add("(min-width: 768px)", () => {
       const cards = gsap.utils.toArray<HTMLElement>(".circuit-card");
       
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top top",
-          end: "+=4000", // Slightly shorter since we removed one spotlight
+          end: "+=4000",
           scrub: 1,
           pin: true,
           invalidateOnRefresh: true,
         }
       });
 
-      // --- STAGE 1: Monaco Spotlight ---
-      // (Starts visible and animates path drawing on scroll)
-
-      // --- STAGE 2: Transition to Deck ---
       tl.to(".monaco-spotlight", { opacity: 0, scale: 0.9, y: -20, pointerEvents: "none" }, "deck-start");
       tl.fromTo(".world-tour-deck", 
         { opacity: 0, scale: 1.1, y: 20 }, 
@@ -48,7 +47,6 @@ export default function CircuitSpotlight() {
         "deck-start+=0.2"
       );
 
-      // FANNING THE DECK
       cards.forEach((card, i) => {
         tl.to(card, {
           x: i * 80,
@@ -56,13 +54,24 @@ export default function CircuitSpotlight() {
           ease: "none",
         }, "deck-start+=0.5");
       });
+    });
 
-    }, containerRef);
+    // Mobile: Native stacking, reveal without pinning
+    mm.add("(max-width: 767px)", () => {
+       gsap.to(".world-tour-deck", { 
+           opacity: 1, 
+           pointerEvents: "auto", 
+           position: "relative",
+           scrollTrigger: {
+               trigger: ".world-tour-deck",
+               start: "top 80%",
+           }
+       });
+    });
 
-    return () => ctx.revert();
+    return () => mm.revert();
   }, []);
 
-  // Sync Path Animation Helper
   const SpotlightTrack = ({ circuit, className, startOffset, endOffset }: { circuit: Circuit, className: string, startOffset: number, endOffset: number }) => {
     const pathRef = useRef<SVGPathElement>(null);
     useEffect(() => {
@@ -84,7 +93,7 @@ export default function CircuitSpotlight() {
     return (
       <div className={`${className} absolute inset-0 w-full h-full flex flex-col md:flex-row items-center justify-center p-8 md:p-20 z-10 transition-opacity duration-500`}>
         <div className="md:w-1/3 z-20">
-           <span className="font-mono text-red-500 font-bold uppercase tracking-[0.3em] text-[10px] mb-4 block">Featured Spotlight</span>
+           <span className="font-mono text-ferrari font-bold uppercase tracking-[0.3em] text-[10px] mb-4 block">Featured Spotlight</span>
            <h2 className="font-heading text-5xl md:text-8xl font-bold uppercase text-white mb-2 leading-none tracking-tighter">{circuit.name}</h2>
            <p className="font-mono text-silver mb-8 uppercase tracking-widest text-xs opacity-60 italic">{circuit.location}</p>
            <div className="flex gap-12">
@@ -100,7 +109,6 @@ export default function CircuitSpotlight() {
         </div>
         <div className="md:w-2/3 flex justify-center relative">
           <svg viewBox="0 0 800 600" className="w-full max-w-2xl drop-shadow-[0_0_40px_rgba(255,255,255,0.05)] scale-110">
-            {/* The 'ghost' path is now removed to allow the tracing to actually 'make' the circuit */}
             <path 
               ref={pathRef}
               d={circuit.path} 
@@ -120,7 +128,6 @@ export default function CircuitSpotlight() {
   return (
     <section ref={containerRef} className="relative w-full h-screen overflow-hidden bg-[#050505] z-30 border-t border-white/5 shadow-2xl">
       
-      {/* STAGE 1: Monaco Spotlight (Starting Screen) */}
       {monaco && (
         <SpotlightTrack 
           circuit={monaco} 
@@ -130,10 +137,9 @@ export default function CircuitSpotlight() {
         />
       )}
 
-      {/* STAGE 2: World Tour Deck */}
       <div className="world-tour-deck opacity-0 pointer-events-none absolute inset-0 w-full h-full flex flex-col items-center justify-center">
         <div className="text-center absolute top-20 left-10 md:left-20">
-           <span className="font-mono text-red-500 font-bold uppercase tracking-[0.3em] text-[10px] mb-4 block">Expand the Tour</span>
+           <span className="font-mono text-ferrari font-bold uppercase tracking-[0.3em] text-[10px] mb-4 block">Expand the Tour</span>
            <h2 className="font-heading text-6xl font-bold uppercase text-white leading-none tracking-tighter">World Grid</h2>
         </div>
 
@@ -141,12 +147,12 @@ export default function CircuitSpotlight() {
            {others.slice(0, 10).map((circuit, idx) => (
              <Link 
                key={circuit.id}
-               href={`/circuits/${circuit.slug}`}
-               className="circuit-card absolute w-[280px] h-[400px] bg-[#111] border border-white/10 rounded-2xl shadow-2xl overflow-hidden group cursor-pointer transition-all hover:border-red-500/50"
+               href={`/races/${circuit.slug}`}
+               className="circuit-card absolute w-[280px] h-[400px] bg-[#111] border border-white/10 rounded-2xl shadow-2xl overflow-hidden group cursor-pointer transition-all hover:border-white/40 focus-visible:outline-white focus-visible:outline-offset-4"
                style={{ zIndex: idx, transformOrigin: "bottom center" }}
              >
                 <div className="absolute left-0 top-0 bottom-0 w-12 bg-black/40 border-r border-white/5 flex items-center justify-center z-20">
-                   <span className="font-heading text-white/40 font-bold uppercase tracking-[0.5em] text-[10px] -rotate-90 whitespace-nowrap group-hover:text-red-500 transition-colors">
+                   <span className="font-heading text-white/40 font-bold uppercase tracking-[0.5em] text-[10px] -rotate-90 whitespace-nowrap group-hover:text-ferrari transition-colors">
                      {circuit.name}
                    </span>
                 </div>
@@ -165,46 +171,53 @@ export default function CircuitSpotlight() {
                    </div>
                    <div className="flex justify-between items-end border-t border-white/5 pt-4">
                       <div className="font-mono text-[9px] text-white/40 uppercase tracking-widest">Details</div>
-                      <span className="text-red-500 font-bold text-xs uppercase group-hover:translate-x-2 transition-transform">&rarr;</span>
+                      <span className="text-ferrari font-bold text-xs uppercase group-hover:translate-x-2 transition-transform">&rarr;</span>
                    </div>
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
              </Link>
            ))}
 
-           {/* More Tracks Toggle */}
            <div 
              onClick={() => setShowGallery(true)}
-             className="circuit-card absolute w-[280px] h-[400px] bg-red-600/10 border-2 border-dashed border-red-500/40 rounded-2xl flex flex-col items-center justify-center group cursor-pointer hover:bg-red-600/20 hover:border-red-500 transition-all shadow-[0_0_30px_rgba(220,0,0,0.1)]"
+             onKeyDown={(e) => {
+               if (e.key === 'Enter' || e.key === ' ') {
+                 e.preventDefault();
+                 setShowGallery(true);
+               }
+             }}
+             tabIndex={0}
+             role="button"
+             aria-label="Open 2026 race calendar gallery"
+             className="circuit-card absolute w-[280px] h-[400px] bg-white/5 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center group cursor-pointer hover:bg-white/10 hover:border-white/30 transition-all shadow-2xl focus-visible:outline-white focus-visible:outline-offset-4"
              style={{ zIndex: 11 }}
            >
-              <div className="w-20 h-20 rounded-full border border-red-500/30 flex items-center justify-center mb-6 group-hover:scale-125 transition-transform duration-500">
-                <span className="text-4xl text-red-500 font-light">+</span>
+              <div className="w-20 h-20 rounded-full border border-white/10 flex items-center justify-center mb-6 group-hover:scale-125 transition-transform duration-500">
+                <span className="text-4xl text-white font-light">+</span>
               </div>
               <span className="font-heading text-lg font-black text-white uppercase tracking-tighter text-center px-6">
                 Explore All<br/>
-                <span className="text-red-500 text-3xl">24</span><br/>
+                <span className="text-ferrari text-3xl">24</span><br/>
                 Tracks
               </span>
            </div>
         </div>
       </div>
 
-      {/* Gallery Overlay */}
       {showGallery && (
         <div className="fixed inset-0 z-[1000] bg-black/98 backdrop-blur-2xl p-10 lg:p-20 flex flex-col items-center justify-around overflow-y-auto">
            <button 
              onClick={() => setShowGallery(false)}
-             className="absolute top-10 right-10 text-white font-mono uppercase text-[10px] tracking-widest border border-white/10 px-6 py-2 hover:bg-white hover:text-black transition-all flex items-center gap-2"
+             className="absolute top-10 right-10 text-white font-mono uppercase text-[10px] tracking-widest border border-white/10 px-6 py-2 hover:bg-white hover:text-black transition-all flex items-center gap-2 focus-visible:outline-white"
            >
              <span className="text-lg">&times;</span> Close Gallery
            </button>
            <h2 className="font-heading text-4xl font-black text-white uppercase mb-12 tracking-[0.3em] text-center">
-             The <span className="text-red-500 text-5xl">2025</span> Calendar
+             The <span className="text-ferrari text-5xl">2026</span> Calendar
            </h2>
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl w-full">
               {(CIRCUITS as unknown as Circuit[]).map(c => (
-                <Link key={c.id} href={`/circuits/${c.slug}`} className="bg-white/5 border border-white/5 p-8 hover:border-red-500/50 transition-all group backdrop-blur-sm rounded-lg">
+                <Link key={c.id} href={`/races/${c.slug}`} className="bg-white/5 border border-white/5 p-8 hover:border-ferrari-light/50 transition-all group backdrop-blur-sm rounded-lg focus-visible:outline-ferrari">
                    <div className="flex justify-between items-center mb-4">
                      <h3 className="font-heading text-xl font-bold text-white uppercase tracking-tighter">{c.name}</h3>
                      <span className="text-[9px] text-white/20 font-mono uppercase tracking-[0.2em]">{c.country}</span>
@@ -218,9 +231,8 @@ export default function CircuitSpotlight() {
         </div>
       )}
 
-      {/* Progress / Transition Indicator */}
       <div className="absolute bottom-10 left-12 flex items-center gap-6 opacity-30 pointer-events-none">
-        <span className="font-mono text-[9px] uppercase tracking-[0.5em] text-red-500 font-bold">Featured Analyst</span>
+        <span className="font-mono text-[9px] uppercase tracking-[0.5em] text-ferrari font-bold">Featured Analyst</span>
         <div className="w-12 h-[1px] bg-white/30" />
         <span className="font-mono text-[9px] uppercase tracking-[0.5em]">Calendar Discovery</span>
       </div>

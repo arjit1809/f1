@@ -17,14 +17,100 @@ export interface Circuit {
   funFact: string;
 }
 
+export interface Team {
+  id: string;
+  name: string;
+  full_name: string;
+  base: string;
+  principal: string;
+  chassis: string;
+  power_unit: string;
+  color: string;
+  logo: string;
+  description: string;
+}
+
+export const TEAMS: Team[] = [
+  { id: "redbull", name: "Red Bull", full_name: "Oracle Red Bull Racing", base: "Milton Keynes, UK", principal: "Christian Horner", chassis: "RB22", power_unit: "Red Bull Powertrains", color: "#3671C6", logo: "/images/teams/redbull.png", description: "The dominant force in recent years, Red Bull continues to push the limits of aerodynamics and engineering." },
+  { id: "ferrari", name: "Ferrari", full_name: "Scuderia Ferrari HP", base: "Maranello, Italy", principal: "Frédéric Vasseur", chassis: "SF-26", power_unit: "Ferrari", color: "#DC0000", logo: "/images/teams/ferrari.png", description: "The most successful team in F1 history, now bolstered by the arrival of Lewis Hamilton for a new era." },
+  { id: "mclaren", name: "McLaren", full_name: "McLaren Formula 1 Team", base: "Woking, UK", principal: "Andrea Stella", chassis: "MCL39", power_unit: "Mercedes", color: "#FF8700", logo: "/images/teams/mclaren.png", description: "A historic team revived, featuring one of the most exciting young driver pairings on the grid." },
+  { id: "mercedes", name: "Mercedes", full_name: "Mercedes-AMG PETRONAS F1 Team", base: "Brackley, UK", principal: "Toto Wolff", chassis: "W17", power_unit: "Mercedes", color: "#27F4D2", logo: "/images/teams/mercedes.png", description: "Seeking to reclaim their spot at the top after a decade of unprecedented success." },
+  { id: "astonmartin", name: "Aston Martin", full_name: "Aston Martin Aramco F1 Team", base: "Silverstone, UK", principal: "Mike Krack", chassis: "AMR26", power_unit: "Honda", color: "#229971", logo: "/images/teams/aston.png", description: "Aggressively expanding their infrastructure with a new campus and Honda power unit partnership." },
+];
+
 export const DRIVERS = [
-  // ... (keeping existing content)
-  { id: "verstappen", name: "Max Verstappen", team: "Red Bull Racing", country: "NL", points: 245, color: "bg-redbull", image: "https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/M/MAXVER01_Max_Verstappen/maxver01.png" },
-  { id: "hamilton", name: "Lewis Hamilton", team: "Ferrari", country: "GB", points: 210, color: "bg-ferrari", image: "https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/L/LEWHAM01_Lewis_Hamilton/lewham01.png" },
-  { id: "leclerc", name: "Charles Leclerc", team: "Ferrari", country: "MC", points: 198, color: "bg-ferrari", image: "https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/C/CHALEC01_Charles_Leclerc/chalec01.png" },
-  { id: "norris", name: "Lando Norris", team: "McLaren", country: "GB", points: 185, color: "bg-mclaren", image: "https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/L/LANNOR01_Lando_Norris/lannor01.png" },
-  { id: "russell", name: "George Russell", team: "Mercedes", country: "GB", points: 150, color: "bg-mercedes", image: "https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/G/GEORUS01_George_Russell/georus01.png" },
-  { id: "piastri", name: "Oscar Piastri", team: "McLaren", country: "AU", points: 142, color: "bg-mclaren", image: "https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/O/OSCPIA01_Oscar_Piastri/oscpia01.png" },
+  { 
+    id: "verstappen", 
+    slug: "max-verstappen",
+    name: "Max Verstappen", 
+    teamId: "redbull",
+    team: "Red Bull Racing", 
+    country: "NL", 
+    points: 245, 
+    color: "bg-redbull", 
+    image: "https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/M/MAXVER01_Max_Verstappen/maxver01.png",
+    bio: "Current world champion and arguably the fastest driver on the grid. Known for his aggressive driving style and relentless consistency."
+  },
+  { 
+    id: "hamilton", 
+    slug: "lewis-hamilton",
+    name: "Lewis Hamilton", 
+    teamId: "ferrari",
+    team: "Ferrari", 
+    country: "GB", 
+    points: 210, 
+    color: "bg-ferrari", 
+    image: "https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/L/LEWHAM01_Lewis_Hamilton/lewham01.png",
+    bio: "The 7-time world champion seeking an elusive 8th title in the iconic scarlet red of Ferrari."
+  },
+  { 
+    id: "leclerc", 
+    slug: "charles-leclerc",
+    name: "Charles Leclerc", 
+    teamId: "ferrari",
+    team: "Ferrari", 
+    country: "MC", 
+    points: 198, 
+    color: "bg-ferrari", 
+    image: "https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/C/CHALEC01_Charles_Leclerc/chalec01.png",
+    bio: "Maranello's golden boy, known for his incredible qualifying pace and deep connection to the Tifosi."
+  },
+  { 
+    id: "norris", 
+    slug: "lando-norris",
+    name: "Lando Norris", 
+    teamId: "mclaren",
+    team: "McLaren", 
+    country: "GB", 
+    points: 185, 
+    color: "bg-mclaren", 
+    image: "https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/L/LANNOR01_Lando_Norris/lannor01.png",
+    bio: "The heartbeat of the new McLaren era, a versatile driver who has matured into a regular race winner."
+  },
+  { 
+    id: "russell", 
+    slug: "george-russell",
+    name: "George Russell", 
+    teamId: "mercedes",
+    team: "Mercedes", 
+    country: "GB", 
+    points: 150, 
+    color: "bg-mercedes", 
+    image: "https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/G/GEORUS01_George_Russell/georus01.png",
+    bio: "The future of Mercedes, a driver whose technical precision and work ethic are helping the Silver Arrows return to glory."
+  },
+  { 
+    id: "piastri", 
+    slug: "oscar-piastri",
+    name: "Oscar Piastri", 
+    teamId: "mclaren",
+    team: "McLaren", 
+    country: "AU", 
+    points: 142, 
+    color: "bg-mclaren", 
+    image: "https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/O/OSCPIA01_Oscar_Piastri/oscpia01.png",
+    bio: "One of the most impressive rookies in recent memory, showing maturity far beyond his years."
+  },
 ];
 
 export const CALENDAR = [

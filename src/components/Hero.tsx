@@ -25,7 +25,7 @@ export default function Hero() {
         className="flex flex-col items-center z-10"
       >
         <h1 className="text-8xl md:text-[12rem] font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-silver tracking-tighter mix-blend-overlay">
-          F1 2025
+          F1 2026
         </h1>
         <p className="text-xl md:text-2xl font-mono text-ferrari font-bold mt-2 uppercase tracking-widest text-shadow-glow">
           The New Era

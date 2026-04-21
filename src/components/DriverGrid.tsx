@@ -5,12 +5,14 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DRIVERS } from "../data/f1-data";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
 export default function DriverGrid() {
+  const router = useRouter();
   const sectionRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -19,7 +21,10 @@ export default function DriverGrid() {
   useEffect(() => {
     if (!sectionRef.current || !scrollRef.current) return;
 
-    const ctx = gsap.context(() => {
+    let mm = gsap.matchMedia();
+
+    // Desktop: Pin and horizontal scroll wrapper
+    mm.add("(min-width: 768px)", () => {
       // Horizontal Scroll with pinning handled by GSAP
       gsap.to(scrollRef.current, {
         x: () => -(scrollRef.current!.scrollWidth - window.innerWidth + 100),
@@ -29,7 +34,7 @@ export default function DriverGrid() {
           start: "top top",
           end: () => `+=${scrollRef.current!.scrollWidth}`,
           scrub: 1,
-          pin: true, // Let GSAP handle the pinning
+          pin: true,
           invalidateOnRefresh: true,
         },
       });
@@ -49,58 +54,51 @@ export default function DriverGrid() {
           });
         }
       });
+    });
 
-      // Hover Effects
-      cardsRef.current.forEach((card, index) => {
-        if (card) {
-          const img = imagesRef.current[index];
-          
-          const onEnter = () => {
-             gsap.to(card, { scale: 1.02, borderColor: "#ffffff66", duration: 0.3 });
-             if (img) gsap.to(img, { scale: 1.1, y: -10, duration: 0.4 });
-          };
-          
-          const onLeave = () => {
-             gsap.to(card, { scale: 1, borderColor: "#333", duration: 0.3 });
-             if (img) gsap.to(img, { scale: 1, y: 0, duration: 0.4 });
-          };
+    // Mobile: Native overflow scroll, no GSAP pinning required
+    mm.add("(max-width: 767px)", () => {
+      // Optional: Add simple vertical entry animations or leave native
+    });
 
-          card.addEventListener("mouseenter", onEnter);
-          card.addEventListener("mouseleave", onLeave);
-          
-          // Cleanup listeners handled by ctx.revert() but we can be explicit
-        }
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
+    return () => mm.revert();
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative w-full bg-black/20 backdrop-blur-[2px] z-20 overflow-hidden">
-      <div className="flex h-screen items-center">
+    <section ref={sectionRef} className="relative w-full bg-black/20 backdrop-blur-[2px] z-20 overflow-hidden min-h-screen md:h-auto">
+      <div className="flex flex-col md:flex-row md:h-screen md:items-center py-32 md:py-0">
         <div className="absolute top-20 left-10 md:left-20 z-10">
           <h2 className="font-heading text-5xl md:text-7xl font-bold uppercase text-white title-shadow">
-            2025 Grid
+            2026 Grid
           </h2>
           <div className="w-24 h-1 bg-ferrari mt-4" />
         </div>
 
-        <div ref={scrollRef} className="flex gap-8 px-10 md:px-20 pt-32 will-change-transform">
+        <div ref={scrollRef} className="flex gap-4 md:gap-8 px-6 md:px-20 pt-10 md:pt-32 will-change-transform overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none pb-10 hide-scrollbar">
           {DRIVERS.map((driver, index) => (
             <div
               key={driver.id}
               ref={(el) => { cardsRef.current[index] = el; }}
-              className="group relative w-[300px] h-[450px] md:w-[400px] md:h-[550px] bg-[#111] overflow-hidden rounded-xl border border-[#333] shrink-0 transition-colors"
+              onClick={() => router.push(`/drivers/${driver.slug}`)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  router.push(`/drivers/${driver.slug}`);
+                }
+              }}
+              tabIndex={0}
+              role="button"
+              aria-label={`View details for ${driver.name}, driving for ${driver.team}`}
+              className="group relative w-[300px] h-[450px] md:w-[400px] md:h-[550px] bg-[#111] overflow-hidden rounded-xl border border-[#333] shrink-0 transition-all duration-300 cursor-pointer hover:border-white/50 focus-visible:outline-white focus-visible:outline-offset-4"
             >
                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10" />
                <div className="absolute bottom-0 w-full h-[90%] transition-transform duration-500">
                 <Image
                   ref={(el) => { imagesRef.current[index] = el as unknown as HTMLImageElement; }}
                   src={driver.image}
-                  alt={driver.name}
+                  alt={`Action portrait of ${driver.name}`}
                   fill
-                  className="object-contain object-bottom"
+                  className="object-contain object-bottom group-hover:scale-110 transition-transform duration-700"
                 />
                </div>
                
@@ -109,7 +107,7 @@ export default function DriverGrid() {
                    <div className="font-mono text-4xl font-black text-white/20 select-none group-hover:text-white/40 transition-colors">
                      {driver.id.substring(0,3).toUpperCase()}
                    </div>
-                   <div className={`w-4 h-4 rounded-full ${driver.color}`} />
+                   <div className={`w-4 h-4 rounded-full ${driver.color}`} aria-hidden="true" />
                 </div>
                 
                 <div>
@@ -126,7 +124,7 @@ export default function DriverGrid() {
                        <span>World Championship</span>
                        <span>{driver.points} pts</span>
                      </div>
-                     <div className="w-full h-1 bg-[#222] rounded-full overflow-hidden">
+                     <div className="w-full h-1 bg-[#222] rounded-full overflow-hidden" role="progressbar" aria-valuenow={driver.points} aria-valuemin={0} aria-valuemax={500}>
                        <div 
                          className={`h-full ${driver.color} transition-all duration-1000`}
                          style={{ width: `${(driver.points / 300) * 100}%` }}

@@ -19,7 +19,13 @@ export default function ExplodedCar() {
   useEffect(() => {
     if (!sectionRef.current) return;
 
-    const ctx = gsap.context(() => {
+    let mm = gsap.matchMedia();
+
+    mm.add({
+      isDesktop: "(min-width: 768px)",
+      isMobile: "(max-width: 767px)"
+    }, (context) => {
+      let { isMobile } = context.conditions as any;
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
@@ -31,20 +37,20 @@ export default function ExplodedCar() {
 
       // Animate Halo
       tl.to(haloRef.current, {
-        y: -150,
+        y: isMobile ? -80 : -150,
         opacity: 1,
         ease: "none",
       }, 0);
 
       // Animate Front Wing
       tl.to(wingRef.current, {
-        x: 200,
+        x: isMobile ? 60 : 200,
         ease: "none",
       }, 0);
 
       // Animate Power Unit
       tl.to(puRef.current, {
-        x: -200,
+        x: isMobile ? -60 : -200,
         ease: "none",
       }, 0);
 
@@ -59,9 +65,9 @@ export default function ExplodedCar() {
           }, index * 0.1 + 0.3);
         }
       });
-    }, sectionRef);
+    });
 
-    return () => ctx.revert();
+    return () => mm.revert();
   }, []);
 
   return (

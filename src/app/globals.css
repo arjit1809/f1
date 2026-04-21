@@ -3,6 +3,14 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --ferrari: #DC0000;
+    --ferrari-light: #FF1E1E; /* WCAG Compliant Red for text on Black */
+    --silver: #C0C0C0;
+    --background: #000000;
+    --foreground: #ffffff;
+  }
+  
   body {
     @apply bg-background text-foreground font-sans antialiased;
   }
@@ -23,6 +31,15 @@
   
   .text-shadow-glow {
     text-shadow: 0 0 10px rgba(255,255,255,0.3);
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }
 

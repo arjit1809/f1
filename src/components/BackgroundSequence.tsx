@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Image from "next/image";
 
 // Register ScrollTrigger
 if (typeof window !== "undefined") {
@@ -21,22 +22,35 @@ export default function BackgroundSequence() {
   // Object for GSAP to animate
   const seqState = useRef({ frame: 0 });
 
-  // Preload images
+  // Preload images with chunking to avoid Main Thread / Network congestion (FID Fix)
   useEffect(() => {
-    const loadedImages: HTMLImageElement[] = [];
+    const loadedImages: HTMLImageElement[] = new Array(FRAME_COUNT);
     let loadCount = 0;
 
-    for (let i = 1; i <= FRAME_COUNT; i++) {
-      const img = new Image();
-      const num = i.toString().padStart(3, "0");
-      img.src = `/background/ezgif-frame-${num}.jpg`;
-      img.onload = () => {
-        loadCount++;
-        setLoadedCount(loadCount);
-      };
-      loadedImages.push(img);
+    const loadBatch = (start: number, end: number) => {
+      for (let i = start; i <= end; i++) {
+        const img = new globalThis.Image();
+        const num = i.toString().padStart(3, "0");
+        img.src = `/background/ezgif-frame-${num}.jpg`;
+        img.onload = () => {
+          loadCount++;
+          setLoadedCount(loadCount);
+        };
+        loadedImages[i - 1] = img;
+      }
+    };
+
+    // Load first 10 frames instantly for immediate scroll response
+    loadBatch(1, 10);
+    setImages([...loadedImages]);
+
+    // Defer the remaining 230 massive frames to clear the main thread
+    if (typeof window !== "undefined") {
+      setTimeout(() => {
+         loadBatch(11, FRAME_COUNT);
+         setImages([...loadedImages]);
+      }, 500);
     }
-    setImages(loadedImages);
   }, []);
 
   const render = useCallback(
@@ -140,9 +154,16 @@ export default function BackgroundSequence() {
     <>
       {/* BACKGROUND LAYER (Negative Z-Index) */}
       <div className="fixed inset-0 w-full h-full -z-50 pointer-events-none overflow-hidden mx-auto">
+        <Image 
+          src="/background/ezgif-frame-001.jpg" 
+          alt="Technical F1 Hub Background"
+          fill
+          priority
+          className={`object-cover opacity-80 mix-blend-screen grayscale contrast-125 transition-opacity duration-1000 ${loadedCount > 0 ? 'opacity-0' : 'opacity-80'}`}
+        />
         <canvas
           ref={canvasRef}
-          className="w-full h-full opacity-80 mix-blend-screen grayscale contrast-125"
+          className="absolute inset-0 w-full h-full opacity-80 mix-blend-screen grayscale contrast-125"
         />
         
         {/* Carbon fiber overlay */}

@@ -1,41 +1,53 @@
+import dynamic from "next/dynamic";
 import BackgroundSequence from "@/components/BackgroundSequence";
 import Hero from "@/components/Hero";
-import ExplodedCar from "@/components/ExplodedCar";
-import DriverGrid from "@/components/DriverGrid";
-import CircuitSpotlight from "@/components/CircuitSpotlight";
-import LiveStandings from "@/components/LiveStandings";
-import Calendar from "@/components/Calendar";
 import Footer from "@/components/Footer";
+
+const ExplodedCar = dynamic(() => import("@/components/ExplodedCar"), { ssr: false });
+const DriverGrid = dynamic(() => import("@/components/DriverGrid"), { ssr: false });
+const CircuitSpotlight = dynamic(() => import("@/components/CircuitSpotlight"), { ssr: false });
+const LiveStandings = dynamic(() => import("@/components/LiveStandings"), { ssr: false });
+const Calendar = dynamic(() => import("@/components/Calendar"), { ssr: false });
+const SocialFeed = dynamic(() => import("@/components/SocialFeed"), { ssr: false });
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen">
-      {/* Background Sequence Layer */}
+    <>
+      {/* Background Sequence Layer (Visual Only) */}
       <BackgroundSequence />
 
-      {/* Hero Section */}
-      <Hero />
+      {/* Main Content Sections */}
+      <section id="hero">
+        <Hero />
+      </section>
 
-      {/* Scrollytelling Modules */}
       <div className="relative z-10 w-full">
-        {/* Module 1: The Car Anatomy */}
-        <ExplodedCar />
+        <section id="anatomy" aria-label="Car Anatomy">
+          <ExplodedCar />
+        </section>
 
-        {/* Module 2: Driver Grid */}
-        <DriverGrid />
+        <section id="drivers" aria-label="Driver Grid">
+          <DriverGrid />
+        </section>
 
-        {/* Module 3: Circuit Spotlight */}
-        <CircuitSpotlight />
+        <section id="spotlight" aria-label="Circuit Spotlight">
+          <CircuitSpotlight />
+        </section>
 
-        {/* Module 4: Live Standings & Charts */}
-        <LiveStandings />
+        <section id="standings" aria-label="Live Standings">
+          <LiveStandings />
+        </section>
 
-        {/* Module 5: 2025 Calendar */}
-        <Calendar />
+        <section id="calendar" aria-label="Race Calendar">
+          <Calendar />
+        </section>
       </div>
 
-      {/* Footer */}
+      <section id="social" aria-label="Team Social Feed">
+        <SocialFeed />
+      </section>
+
       <Footer />
-    </main>
+    </>
   );
 }
